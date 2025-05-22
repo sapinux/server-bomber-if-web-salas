@@ -46,10 +46,20 @@ wss.on('connection', (ws) => {
                     clientRooms.set(ws, Object.keys(rooms).length);  // Mapeia a conexão ws para a sala room.
                 }
 
-                console.log("Total de salas: " + Object.keys(rooms).length);    //depuração
-                console.log("Total de jogadores: " + rooms[Object.keys(rooms).length].size);         //depuração
+                console.log("Total de salas: " + Object.keys(rooms).length);                    //depuração
+                console.log("Total de jogadores: " + rooms[Object.keys(rooms).length].size);    //depuração
                
-                ws.send(JSON.stringify({ event_name: 'Você foi criado!', id: rooms[Object.keys(rooms).length].size }));
+                ws.send(JSON.stringify({ event_name: 'Você foi criado!', id: rooms[Object.keys(rooms).length].size, oi: "bem vindo!" }));
+                if (rooms[Object.keys(rooms).length].size > 1) {
+                    const room = clientRooms.get(ws);
+
+                    // Envia para todos da sala (exceto o remetente)
+                    rooms[room].forEach(client => {
+                        if (client !== ws && client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify({ event_name: 'Jogador na sala!', sala: room, jogador: rooms[Object.keys(rooms).length].size}));
+                        }
+                    })
+                }
 
                 break;
         }
