@@ -21,8 +21,7 @@ wss.on('connection', (ws) => {
         
         switch (data_cliente.event_name) {
             case "create_player_request":   //criar sala aqui
-                
-                
+                            
                 //verifica se existe sala
                 if (Object.keys(rooms).length == 0)  rooms[1] = new Set();  //caso contrario sera criada uma com o indice "1"
                 
@@ -33,8 +32,7 @@ wss.on('connection', (ws) => {
                     // Adiciona o WebSocket ws (a conexão do cliente) ao conjunto de clientes da sala. 
                     // Isso significa que o cliente agora "entrou" na sala.
                     rooms[Object.keys(rooms).length].add(ws);
-                                
-                    
+                                       
                     // clientRooms é um Map que associa cada cliente à sala que ele entrou.
                     // Isso é útil para Saber em que sala o cliente está.
                     // Enviar mensagens apenas para clientes da mesma sala.
@@ -54,6 +52,7 @@ wss.on('connection', (ws) => {
                     const room = clientRooms.get(ws);
 
                     // Envia para todos da sala (exceto o remetente)
+                    // Percorre todos os clientes CONECTADOS à sala especificada.
                     rooms[room].forEach(client => {
                         if (client !== ws && client.readyState === WebSocket.OPEN) {
                             client.send(JSON.stringify({ event_name: 'Jogador na sala!', sala: room, jogador: rooms[Object.keys(rooms).length].size}));
@@ -63,6 +62,8 @@ wss.on('connection', (ws) => {
 
                 break;
         }
+
+        
 
         
 
