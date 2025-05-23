@@ -61,6 +61,31 @@ wss.on('connection', (ws) => {
                 }
 
                 break;
+            case "Create oponente":
+                room = clientRooms.get(ws);
+
+                    // Envia para todos da sala (exceto o remetente)
+                    // Percorre todos os clientes CONECTADOS à sala especificada.
+                    rooms[room].forEach(client => {
+                        if (client !== ws && client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify({ event_name: 'Oponente criado!', sala: room, jogador: data_cliente.id}));
+                        }
+                    })
+
+                break;
+            case "position_update":
+                room = clientRooms.get(ws);
+                    
+                    // Envia para todos da sala (exceto o remetente)
+                    // Percorre todos os clientes CONECTADOS à sala especificada.
+                    rooms[room].forEach(client => {
+                        if (client !== ws && client.readyState === WebSocket.OPEN) {
+                            if ("x" in data_cliente) client.send(JSON.stringify({ event_name: 'Position update!', x: data_cliente.x, id: data_cliente.id}));
+                            if ("y" in data_cliente) client.send(JSON.stringify({ event_name: 'Position update!', y: data_cliente.y, id: data_cliente.id}));
+                        }
+                    })
+
+                break;
         }
 
         
