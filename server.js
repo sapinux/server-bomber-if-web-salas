@@ -86,6 +86,36 @@ wss.on('connection', (ws) => {
                     })
 
                 break;
+            case "create_item":
+                room = clientRooms.get(ws);
+                    
+                    if ("item" in data_cliente) {
+                        // Envia para todos da sala (exceto o remetente)
+                        // Percorre todos os clientes CONECTADOS à sala especificada.
+                        rooms[room].forEach(client => {
+                            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify({ event_name: 'Create item!', item: data_cliente.item, jogador: data_cliente.id, poder_bomba: data_cliente.poder_bomba}));
+                                
+                            }
+                        })
+                    }
+
+                break;
+            case "chutar_bomba":
+                room = clientRooms.get(ws);
+                    
+                    if ("x" in data_cliente) {
+                        // Envia para todos da sala (exceto o remetente)
+                        // Percorre todos os clientes CONECTADOS à sala especificada.
+                        rooms[room].forEach(client => {
+                            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify({ event_name: 'Chutar bomba!', x: data_cliente.x, jogador: data_cliente.id}));
+                                
+                            }
+                        })
+                    }
+
+                break;
         }
 
         
