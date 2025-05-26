@@ -47,7 +47,7 @@ wss.on('connection', (ws) => {
                 console.log("Total de salas: " + Object.keys(rooms).length);                    //depuração
                 console.log("Total de jogadores: " + rooms[Object.keys(rooms).length].size);    //depuração
                
-                ws.send(JSON.stringify({ event_name: 'Você foi criado!', id: rooms[Object.keys(rooms).length].size, oi: "bem vindo!" }));
+                ws.send(JSON.stringify({ event_name: 'Você foi criado!', id: rooms[Object.keys(rooms).length].size, sala: Object.keys(rooms).length }));
                 if (rooms[Object.keys(rooms).length].size > 1) {
                     const room = clientRooms.get(ws);
 
@@ -85,6 +85,26 @@ wss.on('connection', (ws) => {
                         }
                     })
 
+                break;
+            case "iniciar_partida":
+                room = clientRooms.get(ws);
+                        // Envia para todos da sala (exceto o remetente)
+                        // Percorre todos os clientes CONECTADOS à sala especificada.
+                        rooms[room].forEach(client => {
+                            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify({ event_name: 'Iniciar partida!'})); //avisa os jogadores para iniciar a partida
+                            }
+                        })
+                break;
+            case "jogador_escolhido":
+                room = clientRooms.get(ws);
+                        // Envia para todos da sala (exceto o remetente)
+                        // Percorre todos os clientes CONECTADOS à sala especificada.
+                        rooms[room].forEach(client => {
+                            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify({ event_name: 'Jogador escolhido!', item: data_cliente.item, jogador: data_cliente.id})); //avisa os jogadores para iniciar a partida
+                            }
+                        })
                 break;
             case "create_bomba":
                 room = clientRooms.get(ws);
