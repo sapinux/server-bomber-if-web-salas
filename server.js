@@ -6,11 +6,12 @@ const clientRooms = new Map();  // Associa cada cliente à sua sala
 const clientId = new Map();     //Associa cada cliente ao seu id
 const liderRoom = new Map();    //Associa o id do lider à sua sala -
 
+
 var count_sala = 0      //contador de criação de salas
 var count_cliente = 0    //contador de criação de id dos clientes na sala
 //const sala = new Map(); //Associa o cada sala a quantidade de clientes
 
-//var sala_aberta = true;   //controlar a disponibilidade da sala atual
+var sala_aberta = true;   //controlar a disponibilidade da sala atual
 
 wss.on('connection', (ws) => {
     // código que deve ser executado logo após o jogador se conectar
@@ -34,11 +35,12 @@ wss.on('connection', (ws) => {
                 if (Object.keys(rooms).length == 0)  {
                     count_sala ++;
                     rooms[count_sala] = new Set();  //caso contrario sera criada uma sala com o indice "1"
+                    sala_aberta = true              //abre a sala
                 }
                 
                 // Verifica se a sala room já existe no objeto rooms. 
                                           
-                if  (count_cliente < 4) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite
+                if  (count_cliente < 4 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite
 
                     // Adiciona o WebSocket ws (a conexão do cliente) ao conjunto de clientes da sala. 
                     // Isso significa que o cliente agora "entrou" na sala.
@@ -56,13 +58,14 @@ wss.on('connection', (ws) => {
 
                     count_sala ++;  
                     rooms[count_sala] = new Set();              //cria uma nova sala
+                    sala_aberta = true;                         //abre a sala atual
                     
                     count_cliente ++;
                     rooms[count_sala].add(ws);                  //adicionar o cliente na sala atual
                     
                     clientRooms.set(ws, count_sala);            // Mapeia a conexão ws para a sala room.
                     clientId.set(ws, count_cliente)             // Mapeia a conexão ws com o id.
-                    //sala_aberta = true;     //abre a sala atual
+                    
                 }
 
                 console.log("Total de salas: " + Object.keys(rooms).length);    //depuração
@@ -106,15 +109,16 @@ wss.on('connection', (ws) => {
                 break;
 
             case "iniciar_partida":
-                //sala_aberta = false;    //fecha a sala atual
                 room = clientRooms.get(ws);
-                        // Envia para todos da sala (exceto o remetente)
-                        // Percorre todos os clientes CONECTADOS à sala especificada.
-                        rooms[room].forEach(client => {
-                            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                                client.send(JSON.stringify({ event_name: 'Iniciar partida!'})); //avisa os jogadores para iniciar a partida
-                            }
-                        })
+                sala_aberta = false                 //fecha a sala
+                
+                // Envia para todos da sala (exceto o remetente)
+                // Percorre todos os clientes CONECTADOS à sala especificada.
+                    rooms[room].forEach(client => {
+                        if (client !== ws && client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify({ event_name: 'Iniciar partida!'})); //avisa os jogadores para iniciar a partida
+                        }
+                    })
                 break;
 
             case "jogador_escolhido":
@@ -219,7 +223,7 @@ wss.on('connection', (ws) => {
         lider = liderRoom.get(room);    //pega o id do lider da sala 'room'  
         console.log("Sala: " + room);       //------------------depuracao
         console.log("Cliente: " + id);      //------------------depuracao
-        console.log("Líder que saiu: " + lider + " da sala: " + room);     //--------------*-*depuração
+        
         
         if (room && rooms[room]) {  //verifica se esse numero está no rooms
             
@@ -230,6 +234,7 @@ wss.on('connection', (ws) => {
                                 if (client !== ws && client.readyState === WebSocket.OPEN) {
                                     client.send(JSON.stringify({ event_name: 'Oponente saiu!', jogador: id}));
                                     if (lider == id) {
+                                        console.log("Líder que saiu: " + lider + " da sala: " + room);     //--------------*-*depuração
                                         client.send(JSON.stringify({ event_name: 'Novo lider!'}));  //envia a liderança para o primeiro da lista
                                         liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
                                         lider = 0;                  //zera o lider
