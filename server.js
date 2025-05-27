@@ -36,6 +36,10 @@ wss.on('connection', (ws) => {
                     rooms[count_sala] = new Set();  //caso contrario sera criada uma sala com o indice "1"
                     sala_aberta = true              //abre a sala
                 }
+                else if (!rooms[count_sala]) {
+                    rooms[count_sala] = new Set();  //cria uma nova sala
+                    sala_aberta = true              //abre a sala
+                }
                 
                 // Verifica se a sala room já existe no objeto rooms. 
                                           
@@ -253,7 +257,8 @@ wss.on('connection', (ws) => {
             }
 
             rooms[room].delete(ws); // Deleta o cliente na sala
-            
+           
+            //verificar -----------------------
             if (room == count_sala && rooms[room].size == 0) count_cliente = 0;  //se a sala for atual e sair todos os clientes, zera o count_cliente
 
             console.log("Total de jogadores: " + rooms[room].size);         //-------------depuração
@@ -266,6 +271,7 @@ wss.on('connection', (ws) => {
             if (Object.keys(rooms).length == 0) count_sala = 0; //reinicia o contador
 
             console.log("Total de salas: " + Object.keys(rooms).length);    //-----------depuração
+            console.log("Count sala: " + count_sala);    //-----------depuração
             
         }
     });
