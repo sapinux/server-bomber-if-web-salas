@@ -173,7 +173,7 @@ wss.on('connection', (ws) => {
                         // Percorre todos os clientes CONECTADOS à sala especificada.
                         rooms[room].forEach(client => {
                             if (client !== ws && client.readyState === WebSocket.OPEN) {
-                             client.send(JSON.stringify({ event_name: 'Lancar bomba!', item: data_cliente.item, jogador: data_cliente.id, direcao: data_cliente.direcao}));
+                                client.send(JSON.stringify({ event_name: 'Lancar bomba!', item: data_cliente.item, jogador: data_cliente.id, direcao: data_cliente.direcao}));
                             }
                         })
                     }
@@ -187,7 +187,7 @@ wss.on('connection', (ws) => {
                         // Percorre todos os clientes CONECTADOS à sala especificada.
                         rooms[room].forEach(client => {
                             if (client !== ws && client.readyState === WebSocket.OPEN) {
-                             client.send(JSON.stringify({ event_name: 'Create bonus!', item: data_cliente.item, jogador: data_cliente.id, x: data_cliente.x, y: data_cliente.y}));
+                                client.send(JSON.stringify({ event_name: 'Create bonus!', item: data_cliente.item, jogador: data_cliente.id, x: data_cliente.x, y: data_cliente.y}));
                             }
                         })
                     }
@@ -206,23 +206,34 @@ wss.on('connection', (ws) => {
         console.log("Player desconectou!");
                         
         const room = clientRooms.get(ws);   //carrega o numero da sala do cliente que desconectou
-                
-        console.log("sala: " + room);
+        const id = clientId.get(ws);        //carrega o numero do cliente que desconectou        
+        
+        console.log("Sala: " + room);       //------------------depuracao
+        console.log("Cliente: " + id);      //------------------depuracao
         
         if (room && rooms[room]) {  //verifica se esse numero está no rooms
             
-            rooms[room].delete(ws); // Deleta o cliente na sala
-                        
-            
+            if (rooms[room].size > 1) {   //se houver mais jogadores na sala atual
+                //envia pra todos os jogadores da sala que o cliente desconectou
+                rooms[room].forEach(client => {
+                                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                                    client.send(JSON.stringify({ event_name: 'Oponente saiu!', jogador: id}));
+                                }
+                })
+            }
 
-            console.log("Total de jogadores: " + rooms[room].size);         //depuração
+            rooms[room].delete(ws); // Deleta o cliente na sala
+            
+            console.log("Total de jogadores: " + rooms[room].size);         //-------------depuração
             
             if (rooms[room].size === 0) delete rooms[room]; // Se não existe cliente na sala, delete-a
-            clientRooms.delete(ws);
+            
+            clientRooms.delete(ws);     //deleta o mapa do cliente com a sala
+            clientId.delete(ws);        //deleta o mapa do cliente com o id
             
             if (Object.keys(rooms).length == 0) count_sala = 0; //reinicia o contador
 
-            console.log("Total de salas: " + Object.keys(rooms).length);    //depuração
+            console.log("Total de salas: " + Object.keys(rooms).length);    //-----------depuração
             
         }
 
