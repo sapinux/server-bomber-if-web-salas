@@ -246,6 +246,10 @@ wss.on('connection', (ws) => {
                         }
                     }
                 })
+            } else if (lider == id) {
+                            console.log("Líder que saiu: " + lider + " da sala: " + room);     //--------------*-*depuração
+                            liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
+                            lider = 0;                  //zera o lider
             }
 
             rooms[room].delete(ws); // Deleta o cliente na sala
