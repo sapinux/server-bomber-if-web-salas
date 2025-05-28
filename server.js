@@ -7,10 +7,10 @@ const clientId = new Map();     //Associa cada cliente ao seu id
 const liderRoom = new Map();    //Associa o id do lider à sua sala -
 
 
-var count_sala = 0      //contador de criação de salas
-var count_cliente = 0    //contador de criação de id dos clientes na sala
+var count_sala = 0          //contador de criação de salas
+var count_cliente = 0       //contador de criação de id dos clientes na sala
 
-var sala_aberta = true;   //controlar a disponibilidade da sala atual
+var sala_aberta = true;     //controlar a disponibilidade da sala atual
 
 wss.on('connection', (ws) => {
     // código que deve ser executado logo após o jogador se conectar
@@ -28,22 +28,22 @@ wss.on('connection', (ws) => {
         }
         
         switch (data_cliente.event_name) {
-            case "create_player_request":   //criar sala aqui
+            case "create_player_request":           //criar sala aqui
                             
                 //verifica se existe sala
                 if (Object.keys(rooms).length == 0)  {
-                    count_sala ++;
+                    count_sala ++;                  //inicia o contador
                     rooms[count_sala] = new Set();  //caso contrario sera criada uma sala com o indice "1"
                     sala_aberta = true              //abre a sala
                 }
-                else if (!rooms[count_sala]) {
+                else if (!rooms[count_sala]) {      //se não existir room com o indice da room atual
                     rooms[count_sala] = new Set();  //cria uma nova sala
                     sala_aberta = true              //abre a sala
                 }
                 
                 // Verifica se a sala room já existe no objeto rooms. 
                                           
-                if  (count_cliente < 4 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite
+                if  (count_cliente < 4 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite e aberta
 
                     // Adiciona o WebSocket ws (a conexão do cliente) ao conjunto de clientes da sala. 
                     // Isso significa que o cliente agora "entrou" na sala.
@@ -56,10 +56,12 @@ wss.on('connection', (ws) => {
                     // Remover o cliente da sala certa quando ele desconectar.
                     clientRooms.set(ws, count_sala);            // Mapeia a conexão ws com a sala room.
                     clientId.set(ws, count_cliente)             // Mapeia a conexão ws com o id.
-                } else {        //se a sala estiver cheia 
-                    count_cliente = 0;
+                
+                } else {        //se a sala estiver cheia ou fechada
+                    
+                    count_cliente = 0;                          //zera o contador de clientes na sala
 
-                    count_sala ++;  
+                    count_sala ++;                              //conta a  sala
                     rooms[count_sala] = new Set();              //cria uma nova sala
                     sala_aberta = true;                         //abre a sala atual
                     
@@ -75,8 +77,7 @@ wss.on('connection', (ws) => {
                 console.log("Sala atual: " + count_sala);                       //depuração
                 console.log("Jogador: " + count_cliente);                       //depuração
                 console.log("Total de jogadores: " + rooms[count_sala].size);   //depuração
-                //console.log("Líder: " + lider);   //depuração
-               
+                               
                 //envia para o cliente que acabou de entrar na sala
                 ws.send(JSON.stringify({ event_name: 'Você foi criado!', id: count_cliente, sala: count_sala}));
                 
@@ -90,7 +91,6 @@ wss.on('connection', (ws) => {
                         }
                     })
                 }
-
                 break;
             
             case "lider":
@@ -230,6 +230,7 @@ wss.on('connection', (ws) => {
         room = clientRooms.get(ws);     //carrega o numero da sala do cliente que desconectou
         id = clientId.get(ws);          //carrega o numero do cliente que desconectou        
         lider = liderRoom.get(room);    //pega o id do lider da sala 'room'  
+        
         console.log("Sala: " + room);       //------------------depuracao
         console.log("Cliente: " + id);      //------------------depuracao
         
@@ -251,27 +252,26 @@ wss.on('connection', (ws) => {
                     }
                 })
             } else if (lider == id) {
-                            console.log("Líder que saiu: " + lider + " da sala: " + room);     //--------------*-*depuração
+                            console.log("Líder " + lider + " saiu da sala: " + room);     //--------------*-*depuração
                             liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
                             lider = 0;                  //zera o lider
             }
 
             rooms[room].delete(ws); // Deleta o cliente na sala
            
-            //verificar -----------------------
             if (room == count_sala && rooms[room].size == 0) count_cliente = 0;  //se a sala for atual e sair todos os clientes, zera o count_cliente
 
-            console.log("Total de jogadores: " + rooms[room].size);         //-------------depuração
+            console.log("Total de jogadores: " + rooms[room].size);             //-------------depuração
             
-            if (rooms[room].size === 0) delete rooms[room]; // Se não existe cliente na sala, delete-a
+            if (rooms[room].size === 0) delete rooms[room];                     // Se não existe cliente na sala, delete-a
             
             clientRooms.delete(ws);     //deleta o mapa do cliente com a sala
             clientId.delete(ws);        //deleta o mapa do cliente com o id
             
-            if (Object.keys(rooms).length == 0) count_sala = 0; //reinicia o contador
+            if (Object.keys(rooms).length == 0) count_sala = 0;     //se não houver sala reinicia o contador de salas
 
             console.log("Total de salas: " + Object.keys(rooms).length);    //-----------depuração
-            console.log("Count sala: " + count_sala);    //-----------depuração
+            console.log("Count sala: " + count_sala);                       //-----------depuração
             
         }
     });
