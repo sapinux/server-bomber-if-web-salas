@@ -14,7 +14,7 @@ var sala_aberta = true;     //controlar a disponibilidade da sala atual
 
 wss.on('connection', (ws) => {
     // código que deve ser executado logo após o jogador se conectar
-    console.log("Um novo Player conectado!");
+    console.log("Um novo Player conectado!------------------------");
     
     ws.on('message', (data) => {
         console.log(`O cliente nos enviou: ${data}`);
@@ -39,11 +39,12 @@ wss.on('connection', (ws) => {
                 else if (!rooms[count_sala]) {      //se não existir room com o indice da room atual
                     rooms[count_sala] = new Set();  //cria uma nova sala
                     sala_aberta = true              //abre a sala
+                    console.log("Sala recriada: " + count_sala);                       //-----------depuração
                 }
                 
                 // Verifica se a sala room já existe no objeto rooms. 
                                           
-                if  (rooms[count_sala].size < 4 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite e aberta
+                if  (rooms[count_sala].size < 3 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite e aberta
 
                     // Adiciona o WebSocket ws (a conexão do cliente) ao conjunto de clientes da sala. 
                     // Isso significa que o cliente agora "entrou" na sala.
@@ -115,7 +116,9 @@ wss.on('connection', (ws) => {
 
             case "iniciar_partida":
                 room = clientRooms.get(ws);
-                sala_aberta = false                 //fecha a sala
+                
+                //se a sala for a atual
+                if (room == count_sala)  sala_aberta = false                 //fecha a sala
                 
                 // Envia para todos da sala (exceto o remetente)
                 // Percorre todos os clientes CONECTADOS à sala especificada.
@@ -225,7 +228,7 @@ wss.on('connection', (ws) => {
 
     // lidar com o que fazer quando os clientes se desconectam do servidor
     ws.on('close', () => {
-        console.log("Player desconectou!");
+        console.log("Player desconectou!---------------------------------");
                         
         room = clientRooms.get(ws);     //carrega o numero da sala do cliente que desconectou
         id = clientId.get(ws);          //carrega o numero do cliente que desconectou        
@@ -263,7 +266,10 @@ wss.on('connection', (ws) => {
 
             console.log("Total de jogadores: " + rooms[room].size);             //-------------depuração
             
-            if (rooms[room].size === 0) delete rooms[room];                     // Se não existe cliente na sala, delete-a
+            if (rooms[room].size === 0) {
+                delete rooms[room];                                                 // Se não existe cliente na sala, delete-a
+                console.log("Sala eliminada: " + count_sala);                       //-----------depuração
+            }
             
             clientRooms.delete(ws);     //deleta o mapa do cliente com a sala
             clientId.delete(ws);        //deleta o mapa do cliente com o id
