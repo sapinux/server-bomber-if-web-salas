@@ -43,7 +43,7 @@ wss.on('connection', (ws) => {
                 
                 // Verifica se a sala room já existe no objeto rooms. 
                                           
-                if  (count_cliente < 4 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite e aberta
+                if  (rooms[count_sala].size < 4 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite e aberta
 
                     // Adiciona o WebSocket ws (a conexão do cliente) ao conjunto de clientes da sala. 
                     // Isso significa que o cliente agora "entrou" na sala.
