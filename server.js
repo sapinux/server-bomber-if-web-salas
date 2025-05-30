@@ -44,7 +44,7 @@ wss.on('connection', (ws) => {
                 
                 // Verifica se a sala room já existe no objeto rooms. 
                                           
-                if  (rooms[count_sala].size < 3 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite e aberta
+                if  (rooms[count_sala].size < 5 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite e aberta
 
                     // Adiciona o WebSocket ws (a conexão do cliente) ao conjunto de clientes da sala. 
                     // Isso significa que o cliente agora "entrou" na sala.
@@ -230,6 +230,19 @@ wss.on('connection', (ws) => {
                 rooms[room].forEach(client => {
                     if (client !== ws && client.readyState === WebSocket.OPEN) {
                         client.send(JSON.stringify({ event_name: 'Morreu!', jogador: data_cliente.id}));
+                    }
+                })
+                
+                break;
+
+            case "placar":
+                room = clientRooms.get(ws);
+                                
+                // Envia para todos da sala (exceto o remetente)
+                // Percorre todos os clientes CONECTADOS à sala especificada.
+                rooms[room].forEach(client => {
+                    if (client !== ws && client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify({ event_name: 'Placar!', jogador: data_cliente.id}));
                     }
                 })
                 
