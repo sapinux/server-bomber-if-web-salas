@@ -247,6 +247,20 @@ wss.on('connection', (ws) => {
                 })
                 
                 break;
+            case "empate":
+                room = clientRooms.get(ws);
+                                
+                // Envia para todos da sala (exceto o remetente)
+                // Percorre todos os clientes CONECTADOS à sala especificada.
+                rooms[room].forEach(client => {
+                    if (client !== ws && client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify({ event_name: 'Empate!', jogador: data_cliente.id}));
+                    }
+                })
+                
+                break;
+            
+            
         }
     })
 
