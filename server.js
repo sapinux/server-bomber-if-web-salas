@@ -80,7 +80,7 @@ wss.on('connection', (ws) => {
                 console.log("Total de jogadores: " + rooms[count_sala].size);   //depuração
                                
                 //envia para o cliente que acabou de entrar na sala
-                ws.send(JSON.stringify({ event_name: 'Você foi criado!', id: count_cliente, sala: count_sala}));
+                ws.send(JSON.stringify({ event_name: 'Você foi criado!', jogador: count_cliente, sala: count_sala}));
                 
                 if (rooms[count_sala].size > 1) {   //se houver mais jogadores na sala atual
                                         
