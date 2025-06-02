@@ -242,7 +242,7 @@ wss.on('connection', (ws) => {
                 // Percorre todos os clientes CONECTADOS à sala especificada.
                 rooms[room].forEach(client => {
                     if (client !== ws && client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({ event_name: 'Placar!', jogador: data_cliente.id}));
+                        client.send(JSON.stringify({ event_name: 'Placar!', jogador: data_cliente.id, item: data_cliente.item}));
                     }
                 })
                 
