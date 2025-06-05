@@ -261,8 +261,64 @@ wss.on('connection', (ws) => {
                 
                 break;
             
-            
+            case "sair":    //situacao onde o cliente fica só na sala ou quando concluir o torneio
+                console.log("Player desconectou!---------------------------------");
+                        
+                room = clientRooms.get(ws);     //carrega o numero da sala do cliente que desconectou
+                id = clientId.get(ws);          //carrega o numero do cliente que desconectou        
+                lider = liderRoom.get(room);    //pega o id do lider da sala 'room'  
+                
+                console.log("Sala: " + room);       //------------------depuracao
+                console.log("Cliente: " + id);      //------------------depuracao
+                
+                
+                if (room && rooms[room]) {  //verifica se esse numero está no rooms
+                    
+                    if (rooms[room].size > 1) {   //se houver mais jogadores na sala atual
+                        
+                        //envia pra todos os jogadores da sala que o cliente desconectou
+                        rooms[room].forEach(client => {
+                            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify({ event_name: 'Oponente saiu!', jogador: id}));
+                                if (lider == id) {
+                                    console.log("Líder que saiu: " + lider + " da sala: " + room);     //--------------*-*depuração
+                                    client.send(JSON.stringify({ event_name: 'Novo lider!'}));  //envia a liderança para o primeiro da lista
+                                    liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
+                                    lider = 0;                  //zera o lider
+                                }
+                            }
+                        })
+                    } else if (lider == id) {
+                                    console.log("Líder " + lider + " saiu da sala: " + room);     //--------------*-*depuração
+                                    liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
+                                    lider = 0;                  //zera o lider
+                    }
+
+                    rooms[room].delete(ws); // Deleta o cliente na sala
+                
+                    if (room == count_sala && rooms[room].size == 0) count_cliente = 0;  //se a sala for atual e sair todos os clientes, zera o count_cliente
+
+                    console.log("Total de jogadores: " + rooms[room].size);             //-------------depuração
+                    
+                    if (rooms[room].size === 0) {
+                        delete rooms[room];                                                 // Se não existe cliente na sala, delete-a
+                        console.log("Sala eliminada: " + count_sala);                       //-----------depuração
+                    }
+                    
+                    clientRooms.delete(ws);     //deleta o mapa do cliente com a sala
+                    clientId.delete(ws);        //deleta o mapa do cliente com o id
+                    
+                    if (Object.keys(rooms).length == 0) count_sala = 0;     //se não houver sala reinicia o contador de salas
+
+                    console.log("Total de salas: " + Object.keys(rooms).length);    //-----------depuração
+                    console.log("Count sala: " + count_sala);                       //-----------depuração
+                    
+                }
+
+                break
+
         }
+    
     })
 
     // lidar com o que fazer quando os clientes se desconectam do servidor
