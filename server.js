@@ -14,7 +14,7 @@ var sala_aberta = true;     //controlar a disponibilidade da sala atual
 
 wss.on('connection', (ws) => {
     // código que deve ser executado logo após o jogador se conectar
-    console.log("Um novo Player conectado!------------------------");
+    console.log("Um novo Player conectado!-----------------------------------------------------------");
     
     // código que deve ser executado quando recebe mensagem do cliente
     ws.on('message', (data) => {
@@ -262,7 +262,7 @@ wss.on('connection', (ws) => {
                 break;
             
             case "sair":    //situacao onde o cliente fica só na sala ou quando concluir o torneio
-                console.log("Player desconectou!---------------------------------");
+                console.log("Player desconectou!----------------------------------------------------");
                         
                 room = clientRooms.get(ws);     //carrega o numero da sala do cliente que desconectou
                 id = clientId.get(ws);          //carrega o numero do cliente que desconectou        
