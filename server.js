@@ -16,6 +16,7 @@ wss.on('connection', (ws) => {
     // código que deve ser executado logo após o jogador se conectar
     console.log("Um novo Player conectado!------------------------");
     
+    // código que deve ser executado quando recebe mensagem do cliente
     ws.on('message', (data) => {
         console.log(`O cliente nos enviou: ${data}`);
         let data_cliente;
