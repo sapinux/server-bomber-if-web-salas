@@ -261,38 +261,51 @@ wss.on('connection', (ws) => {
                 
                 break;
             
+            case "campeao":
+                room = clientRooms.get(ws);
+                                
+                // Envia para todos da sala (exceto o remetente)
+                // Percorre todos os clientes CONECTADOS à sala especificada.
+                rooms[room].forEach(client => {
+                    if (client !== ws && client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify({ event_name: 'Campeao!', jogador: data_cliente.id}));
+                    }
+                })
+                
+                break;
+            
             case "sair":    //situacao onde o cliente fica só na sala ou quando concluir o torneio
                 console.log("Player desconectou!----------------------------------------------------");
                         
                 room = clientRooms.get(ws);     //carrega o numero da sala do cliente que desconectou
                 id = clientId.get(ws);          //carrega o numero do cliente que desconectou        
-                lider = liderRoom.get(room);    //pega o id do lider da sala 'room'  
+                //lider = liderRoom.get(room);    //pega o id do lider da sala 'room'  
                 
                 console.log("Sala: " + room);       //------------------depuracao
                 console.log("Cliente: " + id);      //------------------depuracao
                 
                 
                 if (room && rooms[room]) {  //verifica se esse numero está no rooms
-                    
-                    if (rooms[room].size > 1) {   //se houver mais jogadores na sala atual
+                //    
+                //    if (rooms[room].size > 1) {   //se houver mais jogadores na sala atual
                         
                         //envia pra todos os jogadores da sala que o cliente desconectou
-                        rooms[room].forEach(client => {
-                            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                                client.send(JSON.stringify({ event_name: 'Oponente saiu!', jogador: id}));
-                                if (lider == id) {
-                                    console.log("Líder que saiu: " + lider + " da sala: " + room);     //--------------*-*depuração
-                                    client.send(JSON.stringify({ event_name: 'Novo lider!'}));  //envia a liderança para o primeiro da lista
-                                    liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
-                                    lider = 0;                  //zera o lider
-                                }
-                            }
-                        })
-                    } else if (lider == id) {
-                                    console.log("Líder " + lider + " saiu da sala: " + room);     //--------------*-*depuração
-                                    liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
-                                    lider = 0;                  //zera o lider
-                    }
+                //        rooms[room].forEach(client => {
+                //            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                //                client.send(JSON.stringify({ event_name: 'Oponente saiu!', jogador: id}));
+                 //               if (lider == id) {
+                //                    console.log("Líder que saiu: " + lider + " da sala: " + room);     //--------------*-*depuração
+                //                    client.send(JSON.stringify({ event_name: 'Novo lider!'}));  //envia a liderança para o primeiro da lista
+                //                    liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
+                //                    lider = 0;                  //zera o lider
+                //                }
+                //            }
+                //        })
+                //    } else if (lider == id) {
+                //                    console.log("Líder " + lider + " saiu da sala: " + room);     //--------------*-*depuração
+                //                    liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
+                //                    lider = 0;                  //zera o lider
+                //   }
 
                     rooms[room].delete(ws); // Deleta o cliente na sala
                 
