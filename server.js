@@ -268,7 +268,7 @@ wss.on('connection', (ws) => {
                 // Percorre todos os clientes CONECTADOS à sala especificada.
                 rooms[room].forEach(client => {
                     if (client !== ws && client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({ event_name: 'Campeao!', jogador: data_cliente.id}));
+                        client.send(JSON.stringify({ event_name: 'Campeao!', jogador: data_cliente.id,  item: data_cliente.item}));
                     }
                 })
                 
@@ -286,27 +286,7 @@ wss.on('connection', (ws) => {
                 
                 
                 if (room && rooms[room]) {  //verifica se esse numero está no rooms
-                //    
-                //    if (rooms[room].size > 1) {   //se houver mais jogadores na sala atual
-                        
-                        //envia pra todos os jogadores da sala que o cliente desconectou
-                //        rooms[room].forEach(client => {
-                //            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                //                client.send(JSON.stringify({ event_name: 'Oponente saiu!', jogador: id}));
-                 //               if (lider == id) {
-                //                    console.log("Líder que saiu: " + lider + " da sala: " + room);     //--------------*-*depuração
-                //                    client.send(JSON.stringify({ event_name: 'Novo lider!'}));  //envia a liderança para o primeiro da lista
-                //                    liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
-                //                    lider = 0;                  //zera o lider
-                //                }
-                //            }
-                //        })
-                //    } else if (lider == id) {
-                //                    console.log("Líder " + lider + " saiu da sala: " + room);     //--------------*-*depuração
-                //                    liderRoom.delete(room);     //deleta o mapa da sala com o id do lider
-                //                    lider = 0;                  //zera o lider
-                //   }
-
+                
                     rooms[room].delete(ws); // Deleta o cliente na sala
                 
                     if (room == count_sala && rooms[room].size == 0) count_cliente = 0;  //se a sala for atual e sair todos os clientes, zera o count_cliente
