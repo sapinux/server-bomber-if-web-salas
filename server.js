@@ -45,7 +45,7 @@ wss.on('connection', (ws) => {
                 
                 // Verifica se a sala room já existe no objeto rooms. 
                                           
-                if  (rooms[count_sala].size < 5 && sala_aberta) { //(rooms[count_sala].size < 3 ) {//&& sala_aberta) {     //se a sala estiver abaixo do limite e aberta
+                if  (rooms[count_sala].size < 10 && sala_aberta) { 
 
                     // Adiciona o WebSocket ws (a conexão do cliente) ao conjunto de clientes da sala. 
                     // Isso significa que o cliente agora "entrou" na sala.
@@ -99,7 +99,7 @@ wss.on('connection', (ws) => {
                 room = clientRooms.get(ws);             //pega a sala do cliente em questao
                 liderRoom.set(room, data_cliente.id)    //mapeia a sala com o id od lider
                 lider = liderRoom.get(room);            //pega o id do lider da sala 'room'
-                console.log("Líder atual: " + lider + " da sala " + room);         //depuração
+                console.log("Líder atual: jogador " + lider + " da sala " + room);         //depuração
                 break;
             
             case "Create oponente":
